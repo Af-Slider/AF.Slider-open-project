@@ -1,0 +1,5 @@
+AF.Slider is distributed under Creative Commons non-commercial licence - see https://creativecommons.org/licenses/by-nc/3.0/it/ for more informations.
+
+<!DOCTYPE html>
+
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Licenza Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">AF.Slider</span> di<a xmlns:cc="http://creativecommons.org/ns#" href="https://www.afslider.it" property="cc:attributionName" rel="cc:attributionURL">Airaghi Fulvio</a> è distribuito con Licenza <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribuzione - Non commerciale - Condividi allo stesso modo 4.0 Internazionale</a>.<br />Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="https://github.com/Af-Slider/AF.Slider-open-project" rel="dct:source">https://github.com/Af-Slider/AF.Slider-open-project</a>.
