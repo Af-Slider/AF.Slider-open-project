@@ -9,3 +9,11 @@ In this repo you can find all the data, files, CAD and scripts used on AF.Slider
 <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="Licenza Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/4.0/88x31.png" />
 
 ![Slider_cover](https://drive.google.com/uc?export=view&id=1kAEW__xtbTNdhV_IeluUMX7fUCWVla8s)
+
+Here you can find the complete BOM for the slider, together with a sourcing list:
+
+  BOM - https://docs.google.com/spreadsheets/d/e/2PACX-1vTk2jxu348yVe4P4dr0VMHoAVMZ_PHeQANC6IF_kKDuW8Oi32bRA98299qZgVoONA/pubhtml?gid=321339593&single=true
+  
+  Sorucing List - https://docs.google.com/spreadsheets/d/e/2PACX-1vTk2jxu348yVe4P4dr0VMHoAVMZ_PHeQANC6IF_kKDuW8Oi32bRA98299qZgVoONA/pubhtml?gid=272212281&single=true
+  
+  
