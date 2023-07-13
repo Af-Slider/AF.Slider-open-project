@@ -6,6 +6,7 @@
  * Firmware version 1.3
  */
 #define FW 1.3
+#define debugM 0 //1 to enable serial.print, 2 to plot stallGuard value, 0 to disable
 
 #include "OLED_encoder.h"
 #include "BLE.h"
@@ -221,25 +222,25 @@ void setup() {
   
 //___________________________________________________________________test driver comunication
 
-  Serial.println(F("\nTesting connection..."));
+  if (debugM) Serial.println(F("\nTesting connection..."));
   uint8_t result = driver.test_connection();
 
   if (result) {
-    Serial.println("failed!");
-    Serial.print("Likely cause: ");
+    if (debugM) Serial.println("failed!");
+    if (debugM) Serial.print("Likely cause: ");
 
     switch(result) {
-        case 1: Serial.println("loose connection"); break;
-        case 2: Serial.println("no power"); break;
+        case 1: if (debugM) Serial.println("loose connection"); break;
+        case 2: if (debugM) Serial.println("no power"); break;
     }
-    Serial.println("Fix the problem and reset board.");
+    if (debugM) Serial.println("Fix the problem and reset board.");
 
     // We need this delay or messages above don't get fully printed out
     delay(100);
     //abort();
     //while (1);
   }
-  Serial.println("OK");
+  if (debugM) Serial.println("OK");
 
   
 //___________________________________________________________________Homing routine
@@ -249,12 +250,12 @@ void setup() {
   direction = 0;
   driver.shaft(!direction);
   
-//  Serial.println(F("start homing"));
+  if (debugM) Serial.println(F("start homing"));
   homing();
   
-//  Serial.println(F("fine homing"));
-//  Serial.print(F("current Position: "));
-//  Serial.println(stepper->getCurrentPosition());
+  if (debugM) Serial.println(F("fine homing"));
+  if (debugM) Serial.print(F("current Position: "));
+  if (debugM) Serial.println(stepper->getCurrentPosition());
 
   assignVal();
   delay(200);
@@ -266,10 +267,10 @@ void setup() {
   stepper->moveTo(HOME, 1);
   Settings.variables[2].val = 0;
   
-//  Serial.print(F("steps tot: "));
-//  Serial.println(END);
-//  Serial.print(F("lunghezza loop: "));
-//  Serial.println(Settings.variables[0].val);
+  if (debugM) Serial.print(F("steps tot: "));
+  if (debugM) Serial.println(END);
+  if (debugM) Serial.print(F("lunghezza loop: "));
+  if (debugM) Serial.println(Settings.variables[0].val);
 
   double temp = Settings.variables[0].val;
   char txString[8];
@@ -386,10 +387,10 @@ void loop() {
           digitalWrite(33, LOW);
           /** CORRECT WITHOUT DELAY*/
           
-          // Serial.print("max_frame ");
-          // Serial.println(max_frame);
-          // Serial.print("frame_count ");
-          // Serial.println(frame_count);
+          if (debugM) Serial.print("max_frame ");
+          if (debugM) Serial.println(max_frame);
+          if (debugM) Serial.print("frame_count ");
+          if (debugM) Serial.println(frame_count);
         }
       break;
 
@@ -476,12 +477,12 @@ void loop() {
   direction = 0;
   driver.shaft(!direction);
   
-  Serial.println(F("start homing"));
+  if (debugM) Serial.println(F("start homing"));
   homing();
   
-  Serial.println(F("fine homing"));
-  Serial.print(F("current Position: "));
-  Serial.println(stepper->getCurrentPosition());
+  if (debugM) Serial.println(F("fine homing"));
+  if (debugM) Serial.print(F("current Position: "));
+  if (debugM) Serial.println(stepper->getCurrentPosition());
 
   assignVal();
   delay(200);
@@ -493,10 +494,10 @@ void loop() {
   stepper->moveTo(HOME, 1);
   Settings.variables[2].val = 0;
   
-  Serial.print(F("steps tot: "));
-  Serial.println(END);
-  Serial.print(F("lunghezza loop: "));
-  Serial.println(Settings.variables[0].val);
+  if (debugM) Serial.print(F("steps tot: "));
+  if (debugM) Serial.println(END);
+  if (debugM) Serial.print(F("lunghezza loop: "));
+  if (debugM) Serial.println(Settings.variables[0].val);
 
   double temp = Settings.variables[0].val;
   char txString[8];
@@ -519,20 +520,20 @@ void temp_print() {
 void firmware_update() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
-  Serial.println("");
+  if (debugM) Serial.println("");
 
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    if (debugM) Serial.print(".");
   }
   
-  Serial.println("");
-  Serial.print("Connected to ");
-  Serial.println(ssid);
+  if (debugM) Serial.println("");
+  if (debugM) Serial.print("Connected to ");
+  if (debugM) Serial.println(ssid);
   IP_address = WiFi.localIP().toString();
-  Serial.print("IP address: ");
-  Serial.println(IP_address);
+  if (debugM) Serial.print("IP address: ");
+  if (debugM) Serial.println(IP_address);
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(200, "text/plain", "Welcome to AF.Slider firmware update page! Please go to yourIPaddress/update");
@@ -540,7 +541,7 @@ void firmware_update() {
 
   AsyncElegantOTA.begin(&server);    // Start AsyncElegantOTA
   server.begin();
-  Serial.println("HTTP server started");
+  if (debugM) Serial.println("HTTP server started");
 
 }
 
@@ -561,8 +562,8 @@ void homing() {
   driver.rms_current(400); // mA
   driver.microsteps(4);
 
-  stepper->setAcceleration(100000);
-  stepper->setSpeedInUs(700);
+  stepper->setAcceleration(homing_acc);
+  stepper->setSpeedInUs(homing_speed);
   
   display.clear();
   display.setTextAlignment(TEXT_ALIGN_CENTER);
@@ -574,9 +575,9 @@ void homing() {
   
   while(isHoming){
     
-    if ((SG_short_average < stallThreshold && stepper->getCurrentPosition() > 1400 && endHoming) || (!endHoming && SG_short_average < stallThreshold && stepper->getCurrentPosition() > 100)) { 
+    if ((SG_short_average < stallThreshold && endHoming && stepper->getCurrentPosition() > 100) || (!endHoming && SG_short_average < stallThreshold && stepper->getCurrentPosition() > 100)) { 
       stepper->forceStop();
-      Serial.println("stall detected");
+      if (debugM) Serial.println("stall detected");
       SG_short_average = 350;
       SG_long_average = 350;
       delay(500);
@@ -609,11 +610,13 @@ void homing() {
       readingCounter ++;
       readingCounterLong ++;
 
+      /*
       if (readingCounterLong > 18){
         SG_long_average = longSum / 18;
         longSum = 0;
         readingCounterLong = 0;
       }
+      */
 
       if (SG_long_average > 400) stallThreshold = SG_long_average * 0.9;
       else stallThreshold = SG_long_average * 0.7;
@@ -624,16 +627,16 @@ void homing() {
         readingCounter = 0;
       }
       
-      // Serial.print("average:");
-      // Serial.print(SG_short_average);
-//      Serial.print(",");
-//      Serial.print("long_average:");
-//      Serial.print(SG_long_average);
-      // Serial.print(",");
-      // Serial.print("Threshold:");
-      // Serial.println(stallThreshold);
-      // Serial.print("current: ");
-      // Serial.println(driver.DRV_STATUS());
+      if (debugM == 2) Serial.print("short average:");
+      if (debugM == 2) Serial.print(SG_short_average);
+      if (debugM == 2) Serial.print(",");
+      //if (debugM == 2) Serial.print("long_average:");
+      //if (debugM == 2) Serial.print(SG_long_average);
+      if (debugM == 2) Serial.print(",");
+      if (debugM == 2) Serial.print("Threshold:");
+      if (debugM == 2) Serial.println(stallThreshold);
+      //if (debugM == 2) Serial.print("current: ");
+      //if (debugM == 2) Serial.println(driver.DRV_STATUS());
       
     }
   }
@@ -648,7 +651,7 @@ void homing() {
 void menuSel () {   //rotary encoder click
   
   if (millis() - firstPress > 2000 && millis() - firstPress < 9000 && layer < 2 ) {
-    Serial.println("Moving to HOME");
+    if (debugM) Serial.println("Moving to HOME");
     direction = 1;
     driver.shaft(direction);
     stepper->setSpeedInUs(480);

@@ -41,7 +41,7 @@ bool    direction;
 int     HOME = 0;
 int     END ;
 
-int homing_speed = 600;
+int homing_speed = 900; //us
 int homing_acc = 100000;
 
 

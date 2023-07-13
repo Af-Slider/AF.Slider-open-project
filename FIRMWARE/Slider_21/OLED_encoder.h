@@ -284,18 +284,18 @@ void conversion () {
   loop_steps = 200 * MICROSTEPS * input_loop / (3.14 * pulley_diam);
   END = loop_steps;
 
-//  Serial.print("END = ");
-//  Serial.println(END);
+  if (debugM) Serial.print("END = ");
+  if (debugM) Serial.println(END);
 
   int compare = 200 * MICROSTEPS * input_startPoint / (3.14 * pulley_diam); 
   
   if (HOME != compare) {
     bool store_direction = direction;
     HOME = compare;
-    Serial.print(F("compare: "));
-    Serial.println(compare);
-    Serial.print(F("current position: "));
-    Serial.println(stepper->getCurrentPosition());
+    if (debugM) Serial.print(F("compare: "));
+    if (debugM) Serial.println(compare);
+    if (debugM) Serial.print(F("current position: "));
+    if (debugM) Serial.println(stepper->getCurrentPosition());
     if (stepper->getCurrentPosition() > compare) direction = 1;
     else direction = 0;
     driver.shaft(direction); 
@@ -325,7 +325,7 @@ void assignVal () {
   else if (caseSel == "pause") TL_pause = menuList[functionMenuSel]->variables[subMenuSel].val;
   else if (caseSel == "Loop") input_loop = menuList[functionMenuSel]->variables[subMenuSel].val;
   else if (caseSel == "No-stop loop") run_cont = menuList[functionMenuSel]->variables[subMenuSel].val;
-  //else Serial.println (F("no valid input found"));
+  //else if (debugM) Serial.println (F("no valid input found"));
   
   conversion();
 

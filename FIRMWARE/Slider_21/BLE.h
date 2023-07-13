@@ -26,7 +26,7 @@ hw_timer_t * timer = NULL;      //used also in Stepper!!
 class MyServerCallbacks: public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       digitalWrite(BT_LED, HIGH);
-      Serial.println(F("CONNECTED")); 
+      if (debugM) Serial.println(F("CONNECTED")); 
       isConnected = true;
       layer = -1;
       updateData = true;
@@ -34,7 +34,7 @@ class MyServerCallbacks: public BLEServerCallbacks {
 
     void onDisconnect(BLEServer* pServer) {
       digitalWrite(BT_LED, LOW);
-      Serial.println(F("DISCONNECTED"));     
+      if (debugM) Serial.println(F("DISCONNECTED"));     
       pServer->getAdvertising()->start();
       isConnected = false;
       layer = 0;
@@ -48,28 +48,28 @@ class StartStopCallbacks: public BLECharacteristicCallbacks {
       String inputString;
       
       if (rxValue.length() > 0) {
-        Serial.println(F("*********"));
-        Serial.print(F("Received Value: "));
+        if (debugM) Serial.println(F("*********"));
+        if (debugM) Serial.print(F("Received Value: "));
         for (int i = 0; i < rxValue.length(); i++){
           inputString += rxValue[i];
         }
-        Serial.print(inputString);
-        Serial.println();
-        Serial.println(F("*********"));
+        if (debugM) Serial.print(inputString);
+        if (debugM) Serial.println();
+        if (debugM) Serial.println(F("*********"));
       }
       
       if (inputString == "ON") {
         play = true; 
         layer = 3;
-        Serial.println(F("ON"));
+        if (debugM) Serial.println(F("ON"));
       }
       else if (inputString == "OFF") {
         play = false;  
         layer = -1;
         stepper->stopMove();
-        Serial.println(F("OFF")); 
+        if (debugM) Serial.println(F("OFF")); 
       }
-      else Serial.println(F("unknown value"));
+      else if (debugM) Serial.println(F("unknown value"));
       updateData = true;
     }
 };
@@ -80,14 +80,14 @@ class speedCallbacks: public BLECharacteristicCallbacks {
       String inputString;
       
       if (rxValue.length() > 0) {
-        Serial.println(F("*********"));
-        Serial.print(F("Received Value speed: "));
+        if (debugM) Serial.println(F("*********"));
+        if (debugM) Serial.print(F("Received Value speed: "));
         for (int i = 0; i < rxValue.length(); i++){
           inputString += rxValue[i];
         }
-        Serial.print(inputString);
-        Serial.println();
-        Serial.println(F("*********"));
+        if (debugM) Serial.print(inputString);
+        if (debugM) Serial.println();
+        if (debugM) Serial.println(F("*********"));
       }
 
       int inputConversion = inputString.toInt();
@@ -95,7 +95,7 @@ class speedCallbacks: public BLECharacteristicCallbacks {
         Slider.variables[0].val = inputConversion;
         input_speed = inputConversion;
       }
-      else Serial.println(F("invalid value"));
+      else if (debugM) Serial.println(F("invalid value"));
       conversion ();
     }
 };
@@ -106,14 +106,14 @@ class accCallbacks: public BLECharacteristicCallbacks {
       String inputString;
       
       if (rxValue.length() > 0) {
-        Serial.println(F("*********"));
-        Serial.print(F("Received Value acc: "));
+        if (debugM) Serial.println(F("*********"));
+        if (debugM) Serial.print(F("Received Value acc: "));
         for (int i = 0; i < rxValue.length(); i++){
           inputString += rxValue[i];
         }
-        Serial.print(inputString);
-        Serial.println();
-        Serial.println(F("*********"));
+        if (debugM) Serial.print(inputString);
+        if (debugM) Serial.println();
+        if (debugM) Serial.println(F("*********"));
       }
 
       double inputConversion = inputString.toDouble();
@@ -121,7 +121,7 @@ class accCallbacks: public BLECharacteristicCallbacks {
        Slider.variables[1].val = inputConversion;
        input_acc = inputConversion;
       }
-      else Serial.println(F("invalid value"));
+      else if (debugM) Serial.println(F("invalid value"));
       conversion ();
     }
 };
@@ -132,14 +132,14 @@ class loop_Callbacks: public BLECharacteristicCallbacks {
       String inputString;
       
       if (rxValue.length() > 0) {
-        Serial.println(F("*********"));
-        Serial.print(F("Received Value loop: "));
+        if (debugM) Serial.println(F("*********"));
+        if (debugM) Serial.print(F("Received Value loop: "));
         for (int i = 0; i < rxValue.length(); i++){
           inputString += rxValue[i];
         }
-        Serial.print(inputString);
-        Serial.println();
-        Serial.println(F("*********"));
+        if (debugM) Serial.print(inputString);
+        if (debugM) Serial.println();
+        if (debugM) Serial.println(F("*********"));
       }
 
       int inputConversion = inputString.toInt();
@@ -147,7 +147,7 @@ class loop_Callbacks: public BLECharacteristicCallbacks {
         Settings.variables[0].val = inputConversion;
         input_loop = inputConversion;
       }
-      else Serial.println(F("invalid value"));
+      else if (debugM) Serial.println(F("invalid value"));
       conversion ();
     }
 };
@@ -158,21 +158,21 @@ class starting_point_Callbacks: public BLECharacteristicCallbacks {
       String inputString;
       
       if (rxValue.length() > 0) {
-        Serial.println(F("*********"));
-        Serial.print(F("Received Value start point: "));
+        if (debugM) Serial.println(F("*********"));
+        if (debugM) Serial.print(F("Received Value start point: "));
         for (int i = 0; i < rxValue.length(); i++){
           inputString += rxValue[i];
         }
-        Serial.print(inputString);
-        Serial.println();
-        Serial.println(F("*********"));
+        if (debugM) Serial.print(inputString);
+        if (debugM) Serial.println();
+        if (debugM) Serial.println(F("*********"));
       }
 
       int inputConversion = inputString.toInt();
       if (inputConversion >= Settings.variables[0].minVal && inputConversion <= Settings.variables[0].maxVal){
         input_startPoint = inputConversion;
       }
-      else Serial.println(F("invalid value"));
+      else if (debugM) Serial.println(F("invalid value"));
       conversion ();
     }
 };
