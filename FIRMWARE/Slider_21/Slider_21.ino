@@ -5,7 +5,7 @@
  * 
  * Firmware version 1.3
  */
-#define FW 1.3
+#define FW 2.0
 #define debugM 0 //1 to enable serial.print, 2 to plot stallGuard value, 0 to disable
 
 #include "OLED_encoder.h"
@@ -55,39 +55,59 @@ void setup() {
   BLECharacteristic *start_stop_Characteristic = pService->createCharacteristic(
                                          start_stop_UUID,
                                          BLECharacteristic::PROPERTY_READ |
-                                         BLECharacteristic::PROPERTY_WRITE |
-                                         BLECharacteristic::PROPERTY_NOTIFY
+                                         BLECharacteristic::PROPERTY_WRITE 
+                                         //BLECharacteristic::PROPERTY_NOTIFY
                                        );
 
   start_stop_Characteristic->setCallbacks(new StartStopCallbacks());
-  
+ 
   BLECharacteristic *speed_Characteristic = pService->createCharacteristic(
                                          speed_UUID,
                                          BLECharacteristic::PROPERTY_READ |
-                                         BLECharacteristic::PROPERTY_WRITE |
-                                         BLECharacteristic::PROPERTY_NOTIFY
+                                         BLECharacteristic::PROPERTY_WRITE 
+                                         //BLECharacteristic::PROPERTY_NOTIFY
                                        );
 
   speed_Characteristic->setCallbacks(new speedCallbacks());
-
+  
+/*
   BLECharacteristic *acc_Characteristic = pService->createCharacteristic(
                                          acc_UUID,
                                          BLECharacteristic::PROPERTY_READ |
-                                         BLECharacteristic::PROPERTY_WRITE |
-                                         BLECharacteristic::PROPERTY_NOTIFY
+                                         BLECharacteristic::PROPERTY_WRITE 
+                                         //BLECharacteristic::PROPERTY_NOTIFY
                                        );
 
   acc_Characteristic->setCallbacks(new accCallbacks());
+*/
 
-  BLECharacteristic *loop_Characteristic = pService->createCharacteristic(
-                                         loop_UUID,
+  BLECharacteristic *step_Characteristic = pService->createCharacteristic(
+                                         step_UUID,
+                                         BLECharacteristic::PROPERTY_READ |
+                                         BLECharacteristic::PROPERTY_WRITE 
+                                         //BLECharacteristic::PROPERTY_NOTIFY
+                                       );
+  step_Characteristic->setCallbacks(new stepCallbacks());
+/*
+  BLECharacteristic *pause_Characteristic = pService->createCharacteristic(
+                                         pause_UUID,
                                          BLECharacteristic::PROPERTY_READ |
                                          BLECharacteristic::PROPERTY_WRITE |
                                          BLECharacteristic::PROPERTY_NOTIFY
                                        );
 
-  loop_Characteristic->setCallbacks(new loop_Callbacks());
+  pause_Characteristic->setCallbacks(new pauseCallbacks());
+*/
+  BLECharacteristic *loop_Characteristic = pService->createCharacteristic(
+                                         loop_UUID,
+                                         BLECharacteristic::PROPERTY_READ |
+                                         BLECharacteristic::PROPERTY_WRITE 
+                                         //BLECharacteristic::PROPERTY_NOTIFY
+                                       );
 
+  loop_Characteristic->setCallbacks(new loopCallbacks());
+
+  /*
   BLECharacteristic *starting_point_Characteristic = pService->createCharacteristic(
                                          starting_point_UUID,
                                          BLECharacteristic::PROPERTY_READ |
@@ -96,15 +116,21 @@ void setup() {
                                        );
 
   starting_point_Characteristic->setCallbacks(new starting_point_Callbacks());
-  
+  */
   
   pServer->setCallbacks(new MyServerCallbacks());
 
   start_stop_Characteristic->setValue("Hello World");
   pService->start();
 
-  BLEAdvertising *pAdvertising = pServer->getAdvertising();
-  pAdvertising->start();
+//  BLEAdvertising *pAdvertising = pServer->getAdvertising();
+//  pAdvertising->start();
+  BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+  pAdvertising->addServiceUUID(SERVICE_UUID);
+  pAdvertising->setScanResponse(true);
+  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  pAdvertising->setMinPreferred(0x12);
+  BLEDevice::startAdvertising();
 
 //____________________________________________________________________OLED & MENU & ENCODER setup
   Slider.title = "Slider";
@@ -310,8 +336,8 @@ void loop() {
   if (revaluate && play){
     bool store_direction = direction;
     max_frame = floor (END / TL_steps);
-    if (direction = 0) frame_count = floor (stepper->getCurrentPosition() / TL_steps) - 1;
-    else frame_count = ceil (stepper->getCurrentPosition() / TL_steps) - 1;
+    if (direction = 0 && frame_count != 0) frame_count = floor (stepper->getCurrentPosition() / TL_steps) - 1;
+    else if (frame_count != 0) frame_count = ceil (stepper->getCurrentPosition() / TL_steps) - 1;
     int prevPos = TL_steps * frame_count;
     driver.shaft(!direction);
     stepper->moveTo(prevPos,1);
@@ -599,6 +625,7 @@ void homing() {
         isHoming = false;
       }
       endHoming = true;
+      if (goingHome == true) endHoming = true;
       last_time = millis();
     }
   
@@ -619,7 +646,7 @@ void homing() {
       */
 
       if (SG_long_average > 400) stallThreshold = SG_long_average * 0.9;
-      else stallThreshold = SG_long_average * 0.7;
+      else stallThreshold = SG_long_average * 0.85;
 
       if (readingCounter > 4){
         SG_short_average = shortSum / 4;
@@ -642,11 +669,6 @@ void homing() {
   }
   setMovement();
 }
-
-
-
-
-
 
 void menuSel () {   //rotary encoder click
   

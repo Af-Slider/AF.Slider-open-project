@@ -284,8 +284,8 @@ void conversion () {
   loop_steps = 200 * MICROSTEPS * input_loop / (3.14 * pulley_diam);
   END = loop_steps;
 
-  if (debugM) Serial.print("END = ");
-  if (debugM) Serial.println(END);
+//  if (debugM) Serial.print("END = ");
+//  if (debugM) Serial.println(END);
 
   int compare = 200 * MICROSTEPS * input_startPoint / (3.14 * pulley_diam); 
   
